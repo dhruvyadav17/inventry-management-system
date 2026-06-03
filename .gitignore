@@ -1,0 +1,7 @@
+/backend-laravel/vendor/
+/backend-laravel/.env
+/backend-laravel/storage/*.key
+/frontend-react/node_modules/
+/frontend-react/dist/
+/.idea/
+/.vscode/

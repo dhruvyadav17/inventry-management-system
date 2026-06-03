@@ -1,0 +1,20 @@
+<svg width="240" height="60" viewBox="0 0 240 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="2" y="2" width="236" height="56" rx="14" fill="#1C2733"/>
+  <rect x="2.5" y="2.5" width="235" height="55" rx="13.5" stroke="white" stroke-opacity=".1"/>
+  <rect x="14" y="12" width="38" height="38" rx="11" fill="#0D6EFD"/>
+  <rect x="14" y="12" width="38" height="38" rx="11" fill="url(#paint0_linear)"/>
+  <path d="M33 19.25 42.25 24V36L33 40.75 23.75 36V24L33 19.25Z" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M24.25 24.35 33 28.9 41.75 24.35" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M33 29V40.35" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <path d="M28.35 22.2 37.65 26.95" stroke="#A7F3D0" stroke-width="1.6" stroke-linecap="round"/>
+  <text x="64" y="28" fill="white" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="800">Inventory</text>
+  <text x="64" y="43" fill="#B8C4D2" font-family="Segoe UI, Arial, sans-serif" font-size="12" font-weight="600">Admin Panel</text>
+  <rect x="206" y="23" width="20" height="14" rx="7" fill="#20C997" fill-opacity=".14"/>
+  <circle cx="215" cy="30" r="4" fill="#20C997"/>
+  <defs>
+    <linearGradient id="paint0_linear" x1="14" y1="12" x2="52" y2="50" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#0D6EFD"/>
+    </linearGradient>
+  </defs>
+</svg>
