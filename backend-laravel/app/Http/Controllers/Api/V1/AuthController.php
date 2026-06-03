@@ -38,7 +38,7 @@ class AuthController extends Controller
             throw ValidationException::withMessages(['email' => ['Invalid credentials.']]);
         }
 
-        $user = User::where('email', $request->email)->with('roles')->firstOrFail();
+        $user = User::where('email', $request->email)->with('roles', 'shops')->firstOrFail();
 
         if ($user->status !== 'active') {
             Auth::logout();
@@ -51,7 +51,7 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        return ApiResponse::success(new UserResource($request->user()->load('roles', 'permissions')));
+        return ApiResponse::success(new UserResource($request->user()->load('roles', 'permissions', 'shops')));
     }
 
     public function logout(Request $request): JsonResponse
@@ -93,7 +93,23 @@ class AuthController extends Controller
         return ApiResponse::success([
             'token' => $token,
             'token_type' => 'Bearer',
-            'user' => new UserResource($user->load('roles', 'permissions')),
+            'redirect_path' => $this->redirectPath($user),
+            'user' => new UserResource($user->load('roles', 'permissions', 'shops')),
         ], $message, $status);
+    }
+
+    private function redirectPath(User $user): string
+    {
+        $roles = $user->roles->pluck('name')->map(fn (string $role) => mb_strtolower($role));
+
+        if ($roles->contains('admin')) {
+            return '/admin/dashboard';
+        }
+
+        if ($roles->contains('shopkeeper')) {
+            return '/shopkeeper/dashboard';
+        }
+
+        return '/dashboard';
     }
 }

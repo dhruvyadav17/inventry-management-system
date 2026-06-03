@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -51,5 +52,20 @@ class User extends Authenticatable
             'deleted_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function shops(): BelongsToMany
+    {
+        return $this->belongsToMany(Shop::class)
+            ->withPivot(['is_primary', 'status'])
+            ->withTimestamps();
+    }
+
+    public function primaryShop(): ?Shop
+    {
+        return $this->shops()
+            ->wherePivot('is_primary', true)
+            ->wherePivot('status', 'active')
+            ->first();
     }
 }

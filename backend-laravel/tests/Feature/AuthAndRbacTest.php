@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\Setting;
+use App\Models\Shop;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -56,6 +57,34 @@ class AuthAndRbacTest extends TestCase
             ->assertJsonPath('data.user.roles.0', 'user');
 
         $this->assertDatabaseHas('roles', ['name' => 'user', 'guard_name' => 'web']);
+    }
+
+    public function test_shopkeeper_login_returns_shopkeeper_redirect_and_shop_assignments(): void
+    {
+        Permission::create(['name' => 'dashboard.view', 'guard_name' => 'web', 'status' => 'active']);
+        $role = Role::create(['name' => 'Shopkeeper', 'guard_name' => 'web', 'status' => 'active']);
+        $role->givePermissionTo('dashboard.view');
+        $shop = Shop::create([
+            'name' => 'Main Shop',
+            'code' => 'MAIN',
+            'status' => 'active',
+        ]);
+        $user = User::factory()->create([
+            'email' => 'shopkeeper@example.com',
+            'password' => Hash::make('password'),
+            'status' => 'active',
+        ]);
+        $user->assignRole($role);
+        $user->shops()->attach($shop->id, ['is_primary' => true, 'status' => 'active']);
+
+        $this->postJson('/api/v1/auth/login', [
+            'email' => 'shopkeeper@example.com',
+            'password' => 'password',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.redirect_path', '/shopkeeper/dashboard')
+            ->assertJsonPath('data.user.shops.0.code', 'MAIN')
+            ->assertJsonPath('data.user.shops.0.is_primary', true);
     }
 
     public function test_user_index_requires_view_permission(): void

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\PermissionController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\SettingController;
+use App\Http\Controllers\Api\V1\ShopkeeperDashboardController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,7 @@ Route::middleware('throttle:api')->group(function (): void {
         Route::put('profile', [ProfileController::class, 'update']);
 
         Route::get('dashboard', [DashboardController::class, 'index'])->middleware('permission:dashboard.view');
+        Route::get('shopkeeper/dashboard', [ShopkeeperDashboardController::class, 'index'])->middleware('permission:shopkeeper.dashboard.view');
         Route::get('reports', [DashboardController::class, 'index'])->middleware('permission:reports.view');
         Route::get('options/rbac', [OptionController::class, 'rbac'])->middleware('permission:users.view|roles.view');
 
