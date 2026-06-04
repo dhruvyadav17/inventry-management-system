@@ -6,6 +6,7 @@ export const PERMISSIONS = {
   settingsView: 'settings.view',
   reportsView: 'reports.view',
   logsView: 'logs.view',
+  shopkeeperDashboardView: 'shopkeeper.dashboard.view',
 } as const;
 
 export type PermissionName = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

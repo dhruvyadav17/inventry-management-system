@@ -10,6 +10,7 @@ import { setCredentials } from './authSlice';
 type LoginResponse = {
   token: string;
   token_type: string;
+  redirect_path?: string;
   user: AuthUser;
 };
 
@@ -26,7 +27,7 @@ export function LoginPage() {
     try {
       const { data } = await api.post<ApiEnvelope<LoginResponse>>('/auth/login', { email, password, remember: true });
       dispatch(setCredentials({ token: data.data.token, user: data.data.user }));
-      navigate('/dashboard');
+      navigate(data.data.redirect_path ?? '/dashboard');
     } catch (error) {
       Swal.fire('Login failed', getApiErrorMessage(error, 'Please check your credentials and account status.'), 'error');
     } finally {

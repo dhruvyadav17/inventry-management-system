@@ -38,5 +38,7 @@ export function useCan(permission: string) {
 }
 
 export function canAccess(user: AuthUser | null | undefined, permission: string) {
-  return Boolean(user?.roles?.includes('admin') || user?.permissions?.includes(permission));
+  const roles = user?.roles?.map((role) => role.toLowerCase()) ?? [];
+
+  return Boolean(roles.includes('admin') || user?.permissions?.includes(permission));
 }

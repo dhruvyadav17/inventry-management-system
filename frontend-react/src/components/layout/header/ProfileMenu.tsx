@@ -4,9 +4,10 @@ import type { AuthUser } from '../../../types';
 type ProfileMenuProps = {
   user: AuthUser | null;
   onLogout: () => void;
+  profilePath: string;
 };
 
-export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
+export function ProfileMenu({ user, onLogout, profilePath }: ProfileMenuProps) {
   const initial = user?.name?.slice(0, 1) ?? 'A';
 
   return (
@@ -27,7 +28,7 @@ export function ProfileMenu({ user, onLogout }: ProfileMenuProps) {
           <span>Role</span>
           <strong>{user?.roles?.[0] ?? 'admin'}</strong>
         </div>
-        <NavLink to="/profile" className="profile-link"><i className="bi bi-person" /> Profile</NavLink>
+        <NavLink to={profilePath} className="profile-link"><i className="bi bi-person" /> Profile</NavLink>
         <button className="profile-link danger" onClick={onLogout}><i className="bi bi-box-arrow-right" /> Logout</button>
       </div>
     </div>

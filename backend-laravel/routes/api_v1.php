@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\SettingController;
 use App\Http\Controllers\Api\V1\ShopkeeperDashboardController;
+use App\Http\Controllers\Api\V1\ShopkeeperInventoryController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,11 @@ Route::middleware('throttle:api')->group(function (): void {
 
         Route::get('dashboard', [DashboardController::class, 'index'])->middleware('permission:dashboard.view');
         Route::get('shopkeeper/dashboard', [ShopkeeperDashboardController::class, 'index'])->middleware('permission:shopkeeper.dashboard.view');
+        Route::get('shopkeeper/options', [ShopkeeperInventoryController::class, 'options'])->middleware('permission:shopkeeper.dashboard.view');
+        Route::get('shopkeeper/{resource}', [ShopkeeperInventoryController::class, 'index'])->middleware('permission:shopkeeper.dashboard.view');
+        Route::post('shopkeeper/{resource}', [ShopkeeperInventoryController::class, 'store'])->middleware('permission:shopkeeper.dashboard.view');
+        Route::match(['put', 'patch'], 'shopkeeper/{resource}/{id}', [ShopkeeperInventoryController::class, 'update'])->middleware('permission:shopkeeper.dashboard.view');
+        Route::delete('shopkeeper/{resource}/{id}', [ShopkeeperInventoryController::class, 'destroy'])->middleware('permission:shopkeeper.dashboard.view');
         Route::get('reports', [DashboardController::class, 'index'])->middleware('permission:reports.view');
         Route::get('options/rbac', [OptionController::class, 'rbac'])->middleware('permission:users.view|roles.view');
 

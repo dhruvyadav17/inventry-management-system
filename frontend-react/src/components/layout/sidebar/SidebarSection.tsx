@@ -1,5 +1,5 @@
 import { SidebarLink } from './SidebarLink';
-import type { SidebarMenuGroup } from './sidebarMenu';
+import type { SidebarMenuGroup } from '../admin/sidebarMenu';
 
 type SidebarSectionProps = SidebarMenuGroup & {
   onNavigate?: () => void;

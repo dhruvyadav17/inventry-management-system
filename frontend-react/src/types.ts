@@ -8,6 +8,13 @@ export type AuthUser = {
   roles: string[];
   permissions: string[];
   profile_photo?: string | null;
+  shops?: Array<{
+    id: number;
+    name: string;
+    code: string;
+    status: Status;
+    is_primary: boolean;
+  }>;
 };
 
 export type ResourceName = 'users' | 'roles' | 'permissions';

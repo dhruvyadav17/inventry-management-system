@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { clearCredentials } from '../../features/auth/authSlice';
-import { api } from '../../services/api';
-import { HeaderStatusStrip } from './header/HeaderStatusStrip';
-import { NotificationMenu } from './header/NotificationMenu';
-import { ProfileMenu } from './header/ProfileMenu';
+import { useAppDispatch, useAppSelector } from '../../../app/hooks';
+import { clearCredentials } from '../../../features/auth/authSlice';
+import { api } from '../../../services/api';
+import { HeaderStatusStrip } from '../header/HeaderStatusStrip';
+import { NotificationMenu } from '../header/NotificationMenu';
+import { ProfileMenu } from '../header/ProfileMenu';
 
 export function AppHeader({ onMenuClick }: { onMenuClick: () => void }) {
   const dispatch = useAppDispatch();
@@ -25,7 +25,7 @@ export function AppHeader({ onMenuClick }: { onMenuClick: () => void }) {
       <HeaderStatusStrip />
       <div className="top-actions">
         <NotificationMenu />
-        <ProfileMenu user={user} onLogout={logout} />
+        <ProfileMenu user={user} onLogout={logout} profilePath="/profile" />
       </div>
     </header>
   );

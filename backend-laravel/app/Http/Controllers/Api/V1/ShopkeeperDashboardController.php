@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Support\ApiResponse;
+use App\Support\ShopkeeperCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ShopkeeperDashboardController extends Controller
@@ -27,68 +29,57 @@ class ShopkeeperDashboardController extends Controller
             ]);
         }
 
-        $products = DB::table('products')
-            ->join('categories', 'categories.id', '=', 'products.category_id')
-            ->where('products.shop_id', $shop->id)
-            ->whereNull('products.deleted_at')
-            ->orderBy('products.stock_quantity')
-            ->limit(8)
-            ->get([
-                'products.id',
-                'products.name',
-                'products.sku',
-                'products.stock_quantity',
-                'products.reorder_level',
-                'products.sale_price',
-                'categories.name as category',
-            ]);
+        $dashboard = Cache::remember(ShopkeeperCache::key('dashboard', $shop->id), ShopkeeperCache::ttl('dashboard'), function () use ($shop): array {
+            $products = DB::table('products')
+                ->join('categories', 'categories.id', '=', 'products.category_id')
+                ->where('products.shop_id', $shop->id)
+                ->whereNull('products.deleted_at')
+                ->orderBy('products.stock_quantity')
+                ->limit(8)
+                ->get([
+                    'products.id',
+                    'products.name',
+                    'products.sku',
+                    'products.stock_quantity',
+                    'products.reorder_level',
+                    'products.sale_price',
+                    'categories.name as category',
+                ]);
 
-        $todaySales = DB::table('sales')
-            ->where('shop_id', $shop->id)
-            ->whereDate('sale_date', now()->toDateString())
-            ->sum('total_amount');
+            $stats = [
+                'products' => DB::table('products')->where('shop_id', $shop->id)->whereNull('deleted_at')->count(),
+                'low_stock' => DB::table('products')->where('shop_id', $shop->id)->whereColumn('stock_quantity', '<=', 'reorder_level')->whereNull('deleted_at')->count(),
+                'customers' => DB::table('customers')->where('shop_id', $shop->id)->whereNull('deleted_at')->count(),
+                'suppliers' => DB::table('suppliers')->where('shop_id', $shop->id)->whereNull('deleted_at')->count(),
+                'today_sales' => (float) DB::table('sales')->where('shop_id', $shop->id)->whereDate('sale_date', now()->toDateString())->sum('total_amount'),
+                'pending_payments' => (float) DB::table('payments')->where('shop_id', $shop->id)->where('status', 'pending')->sum('amount'),
+                'monthly_expenses' => (float) DB::table('expenses')->where('shop_id', $shop->id)->whereMonth('expense_date', now()->month)->whereYear('expense_date', now()->year)->sum('amount'),
+            ];
 
-        $lowStockCount = DB::table('products')
-            ->where('shop_id', $shop->id)
-            ->whereColumn('stock_quantity', '<=', 'reorder_level')
-            ->whereNull('deleted_at')
-            ->count();
+            return [
+                'shop' => [
+                    'id' => $shop->id,
+                    'name' => $shop->name,
+                    'code' => $shop->code,
+                    'status' => $shop->status,
+                ],
+                'stats' => $stats,
+                'products' => $products->map(fn ($product) => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'sku' => $product->sku,
+                    'category' => $product->category,
+                    'stock' => (int) $product->stock_quantity,
+                    'reorder_level' => (int) $product->reorder_level,
+                    'sale_price' => (float) $product->sale_price,
+                    'status' => $product->stock_quantity <= 0 ? 'Out of stock' : ($product->stock_quantity <= $product->reorder_level ? 'Low stock' : 'In stock'),
+                ]),
+                'alerts' => $this->alerts($stats),
+                'modules' => $this->modules(),
+            ];
+        });
 
-        $stats = [
-            'products' => DB::table('products')->where('shop_id', $shop->id)->whereNull('deleted_at')->count(),
-            'low_stock' => $lowStockCount,
-            'customers' => DB::table('customers')->where('shop_id', $shop->id)->whereNull('deleted_at')->count(),
-            'suppliers' => DB::table('suppliers')->where('shop_id', $shop->id)->whereNull('deleted_at')->count(),
-            'today_sales' => (float) $todaySales,
-            'pending_payments' => (float) DB::table('payments')->where('shop_id', $shop->id)->where('status', 'pending')->sum('amount'),
-            'monthly_expenses' => (float) DB::table('expenses')
-                ->where('shop_id', $shop->id)
-                ->whereMonth('expense_date', now()->month)
-                ->whereYear('expense_date', now()->year)
-                ->sum('amount'),
-        ];
-
-        return ApiResponse::success([
-            'shop' => [
-                'id' => $shop->id,
-                'name' => $shop->name,
-                'code' => $shop->code,
-                'status' => $shop->status,
-            ],
-            'stats' => $stats,
-            'products' => $products->map(fn ($product) => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'sku' => $product->sku,
-                'category' => $product->category,
-                'stock' => (int) $product->stock_quantity,
-                'reorder_level' => (int) $product->reorder_level,
-                'sale_price' => (float) $product->sale_price,
-                'status' => $product->stock_quantity <= 0 ? 'Out of stock' : ($product->stock_quantity <= $product->reorder_level ? 'Low stock' : 'In stock'),
-            ]),
-            'alerts' => $this->alerts($stats),
-            'modules' => $this->modules(),
-        ]);
+        return ApiResponse::success($dashboard);
     }
 
     private function alerts(array $stats): array

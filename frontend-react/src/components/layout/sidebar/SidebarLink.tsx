@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import type { SidebarMenuLink } from './sidebarMenu';
+import type { SidebarMenuLink } from '../admin/sidebarMenu';
 
 type SidebarLinkProps = SidebarMenuLink & {
   onNavigate?: () => void;

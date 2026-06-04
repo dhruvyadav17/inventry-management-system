@@ -9,6 +9,7 @@ use App\Models\Setting;
 use App\Models\Shop;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\PermissionRegistrar;
@@ -281,5 +282,65 @@ class AuthAndRbacTest extends TestCase
         $this->actingAs($user, 'sanctum')->postJson("/api/v1/roles/{$roleId}/restore")->assertOk();
         $this->actingAs($user, 'sanctum')->deleteJson("/api/v1/permissions/{$permissionId}")->assertOk();
         $this->actingAs($user, 'sanctum')->postJson("/api/v1/permissions/{$permissionId}/restore")->assertOk();
+    }
+
+    public function test_shopkeeper_inventory_product_stock_sale_and_reports_flow(): void
+    {
+        Permission::create(['name' => 'shopkeeper.dashboard.view', 'guard_name' => 'web', 'status' => 'active']);
+        $role = Role::create(['name' => 'Shopkeeper', 'guard_name' => 'web', 'status' => 'active']);
+        $role->givePermissionTo('shopkeeper.dashboard.view');
+        $shop = Shop::create(['name' => 'Main Shop', 'code' => 'MAIN', 'status' => 'active']);
+        $user = User::factory()->create(['status' => 'active']);
+        $user->assignRole($role);
+        $user->shops()->attach($shop->id, ['is_primary' => true, 'status' => 'active']);
+
+        $productId = $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/shopkeeper/products', [
+                'name' => 'Test Rice',
+                'sku' => 'TR-1',
+                'category_name' => 'Grocery',
+                'purchase_price' => 100,
+                'sale_price' => 140,
+                'stock_quantity' => 5,
+                'reorder_level' => 2,
+                'unit' => 'bag',
+                'status' => 'active',
+            ])
+            ->assertCreated()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.sku', 'TR-1')
+            ->json('data.id');
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/shopkeeper/stock', [
+                'product_id' => $productId,
+                'type' => 'in',
+                'quantity' => 3,
+                'reference' => 'MANUAL',
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.quantity', 3);
+
+        $this->assertSame(8, DB::table('products')->where('id', $productId)->value('stock_quantity'));
+
+        $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/shopkeeper/sales', [
+                'product_id' => $productId,
+                'sale_date' => now()->toDateString(),
+                'quantity' => 2,
+                'unit_price' => 140,
+                'paid_amount' => 280,
+                'payment_status' => 'paid',
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.total_amount', 280);
+
+        $this->assertSame(6, DB::table('products')->where('id', $productId)->value('stock_quantity'));
+
+        $this->actingAs($user, 'sanctum')
+            ->getJson('/api/v1/shopkeeper/reports')
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure(['data' => ['summary', 'low_stock_products', 'recent_sales', 'recent_purchases']]);
     }
 }
