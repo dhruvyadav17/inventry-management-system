@@ -142,19 +142,19 @@ export function ShopkeeperInventoryPage({ resource }: { resource: ShopkeeperReso
 
   return (
     <div className="shop-inventory-page">
-      <section className="shop-page-title">
+      <section className="shop-page-title" data-testid={`shop-${resource}-page`}>
         <div>
           <h1>{resourceTitles[resource]}</h1>
           <span>{resource === 'reports' ? 'Sales, purchase and stock summary' : 'Create records and review current inventory data'}</span>
         </div>
         {resource !== 'reports' && (
-          <button className="shop-title-action" type="button" onClick={() => resetForm(resource)}>
+          <button data-testid={`shop-${resource}-new`} className="shop-title-action" type="button" onClick={() => resetForm(resource)}>
             <i className="bi bi-plus-lg" /> New
           </button>
         )}
       </section>
 
-      {message && <div className="shop-alert mb-3"><i className="bi bi-info-circle" /><span>{message}</span></div>}
+      {message && <div className="shop-alert mb-3" data-testid={`shop-${resource}-message`}><i className="bi bi-info-circle" /><span>{message}</span></div>}
 
       {resource === 'reports' ? (
         <InventoryReportsView report={report} loading={loading} />
@@ -165,10 +165,10 @@ export function ShopkeeperInventoryPage({ resource }: { resource: ShopkeeperReso
               <h2>{editingId ? `Edit ${resourceTitles[resource]}` : `Add ${resourceTitles[resource]}`}</h2>
               {editingId && <button className="shop-panel-menu" type="button" onClick={() => resetForm(resource)}>Cancel</button>}
             </div>
-            <form className="shop-form" onSubmit={save}>
+            <form className="shop-form" onSubmit={save} data-testid={`shop-${resource}-form`}>
               <InventoryFields resource={resource} form={form} options={{ ...options, products: filteredProducts }} errors={errors} onChange={updateField} />
               <InventoryFormSummary resource={resource} form={form} product={selectedProduct} />
-              <button className="shop-action-btn primary w-100" type="submit" disabled={saving}>
+              <button data-testid={`shop-${resource}-save`} className="shop-action-btn primary w-100" type="submit" disabled={saving}>
                 <i className="bi bi-check2" /> {saving ? 'Saving...' : editingId ? 'Update' : 'Save'}
               </button>
             </form>
@@ -178,8 +178,8 @@ export function ShopkeeperInventoryPage({ resource }: { resource: ShopkeeperReso
             <div className="shop-panel-head">
               <h2>{resourceTitles[resource]} List</h2>
               <form className="shop-search-form" onSubmit={(event) => { event.preventDefault(); loadRows(search); }}>
-                <input className="form-control" value={search} placeholder="Search" onChange={(event) => setSearch(event.target.value)} />
-                <button className="shop-action-btn" type="submit"><i className="bi bi-search" /></button>
+                <input data-testid={`shop-${resource}-search`} className="form-control" value={search} placeholder="Search" onChange={(event) => setSearch(event.target.value)} />
+                <button data-testid={`shop-${resource}-apply-search`} className="shop-action-btn" type="submit"><i className="bi bi-search" /></button>
                 {search && <button className="shop-action-btn" type="button" onClick={() => { setSearch(''); loadRows(''); }}><i className="bi bi-x-lg" /></button>}
               </form>
             </div>

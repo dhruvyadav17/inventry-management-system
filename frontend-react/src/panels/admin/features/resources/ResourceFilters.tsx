@@ -14,10 +14,10 @@ export function ResourceFilters({ search, status, perPage, onPerPageChange, onSe
       <div className="card-body">
         <div className="row g-2 resource-filters">
           <div className="col-md-4">
-            <input className="form-control" placeholder="Search" value={search} onChange={(e) => onSearchChange(e.target.value)} />
+            <input data-testid="admin-resource-search" className="form-control" placeholder="Search" value={search} onChange={(e) => onSearchChange(e.target.value)} />
           </div>
           <div className="col-md-3">
-            <select className="form-select" value={status} onChange={(e) => onStatusChange(e.target.value)}>
+            <select data-testid="admin-resource-status-filter" className="form-select" value={status} onChange={(e) => onStatusChange(e.target.value)}>
               <option value="">All status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
@@ -25,14 +25,14 @@ export function ResourceFilters({ search, status, perPage, onPerPageChange, onSe
             </select>
           </div>
           <div className="col-md-2">
-            <select className="form-select" value={perPage} onChange={(e) => onPerPageChange(Number(e.target.value))}>
+            <select data-testid="admin-resource-per-page" className="form-select" value={perPage} onChange={(e) => onPerPageChange(Number(e.target.value))}>
               <option value={10}>10 / page</option>
               <option value={25}>25 / page</option>
               <option value={50}>50 / page</option>
             </select>
           </div>
           <div className="col-md-2">
-            <button className="btn btn-outline-primary w-100" title="Apply filters" aria-label="Apply filters" onClick={onApply}><i className="bi bi-search" /></button>
+            <button data-testid="admin-resource-apply-filters" className="btn btn-outline-primary w-100" title="Apply filters" aria-label="Apply filters" onClick={onApply}><i className="bi bi-search" /></button>
           </div>
         </div>
       </div>

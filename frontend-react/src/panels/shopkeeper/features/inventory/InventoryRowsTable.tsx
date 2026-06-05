@@ -8,7 +8,7 @@ export function InventoryRowsTable({ resource, rows, loading, onEdit, onArchive 
 
   return (
     <div className="shop-table-wrap">
-      <table className="shop-mini-table shop-wide-table">
+      <table className="shop-mini-table shop-wide-table" data-testid={`shop-${resource}-table`}>
         <thead>
           <tr>
             {columns.map((column) => <th key={column.key}>{column.label}</th>)}
@@ -22,8 +22,8 @@ export function InventoryRowsTable({ resource, rows, loading, onEdit, onArchive 
               {showActions && (
                 <td>
                   <div className="shop-row-actions">
-                    <button className="shop-icon-action" type="button" onClick={() => onEdit(row)}><i className="bi bi-pencil" /></button>
-                    <button className="shop-icon-action danger" type="button" onClick={() => onArchive(row)}><i className="bi bi-archive" /></button>
+                    <button data-testid={`shop-${resource}-edit-${row.id}`} className="shop-icon-action" type="button" onClick={() => onEdit(row)}><i className="bi bi-pencil" /></button>
+                    <button data-testid={`shop-${resource}-archive-${row.id}`} className="shop-icon-action danger" type="button" onClick={() => onArchive(row)}><i className="bi bi-archive" /></button>
                   </div>
                 </td>
               )}

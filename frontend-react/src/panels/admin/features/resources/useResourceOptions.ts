@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { apiGet } from '@common/services/api';
 import type { ResourceRecord } from '@common/types';
 import { adminApi } from '../../adminConfig';
@@ -12,7 +12,7 @@ export function useResourceOptions() {
   const [roles, setRoles] = useState<ResourceRecord[]>([]);
   const [permissions, setPermissions] = useState<ResourceRecord[]>([]);
 
-  useEffect(() => {
+  const loadOptions = useCallback(() => {
     apiGet<RbacOptions>(adminApi.rbacOptions)
       .then((options) => {
         setRoles(options.roles ?? []);
@@ -24,5 +24,9 @@ export function useResourceOptions() {
       });
   }, []);
 
-  return { roles, permissions };
+  useEffect(() => {
+    loadOptions();
+  }, [loadOptions]);
+
+  return { roles, permissions, loadOptions };
 }

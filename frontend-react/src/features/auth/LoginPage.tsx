@@ -44,13 +44,13 @@ export function LoginPage() {
           <form onSubmit={submit}>
             <div className="mb-3">
               <label className="form-label">Email</label>
-              <input className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} type="email" required />
+              <input data-testid="login-email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} type="email" required />
             </div>
             <div className="mb-3">
               <label className="form-label">Password</label>
-              <input className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} type="password" required />
+              <input data-testid="login-password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} type="password" required />
             </div>
-            <button className="btn btn-primary w-100" disabled={loading}>
+            <button data-testid="login-submit" className="btn btn-primary w-100" disabled={loading}>
               {loading ? 'Signing in...' : 'Login'}
             </button>
             <div className="auth-links">

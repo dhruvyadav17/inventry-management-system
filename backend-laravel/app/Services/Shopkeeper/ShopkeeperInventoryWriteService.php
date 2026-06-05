@@ -3,6 +3,7 @@
 namespace App\Services\Shopkeeper;
 
 use App\Support\ApiResponse;
+use App\Support\ShopkeeperCache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,6 +23,7 @@ class ShopkeeperInventoryWriteService
         unset($data['category_name']);
 
         $id = DB::table('products')->insertGetId($data + $this->context->timestamps());
+        ShopkeeperCache::clear($shopId);
 
         return ApiResponse::success($this->reads->query('products', $shopId)->where('products.id', $id)->first(), 'Product created', 201);
     }
@@ -33,6 +35,7 @@ class ShopkeeperInventoryWriteService
         unset($data['category_name']);
 
         DB::table('products')->where('shop_id', $shopId)->where('id', $id)->update($data + ['updated_at' => now()]);
+        ShopkeeperCache::clear($shopId);
 
         return ApiResponse::success($this->reads->query('products', $shopId)->where('products.id', $id)->first(), 'Product updated');
     }
@@ -41,6 +44,7 @@ class ShopkeeperInventoryWriteService
     {
         $data['shop_id'] = $shopId;
         $id = DB::table($table)->insertGetId($data + $this->context->timestamps());
+        ShopkeeperCache::clear($shopId);
 
         return ApiResponse::success($this->reads->query($table, $shopId)->where("{$table}.id", $id)->first(), ucfirst(rtrim($table, 's')).' created', 201);
     }
@@ -49,6 +53,7 @@ class ShopkeeperInventoryWriteService
     {
         $this->requireRow($table, $shopId, $id);
         DB::table($table)->where('shop_id', $shopId)->where('id', $id)->update($data + ['updated_at' => now()]);
+        ShopkeeperCache::clear($shopId);
 
         return ApiResponse::success($this->reads->query($table, $shopId)->where("{$table}.id", $id)->first(), ucfirst(rtrim($table, 's')).' updated');
     }
@@ -73,6 +78,8 @@ class ShopkeeperInventoryWriteService
                 'note' => $data['note'] ?? null,
                 'moved_at' => now(),
             ] + $this->context->timestamps());
+
+            ShopkeeperCache::clear($shopId);
 
             return ApiResponse::success($this->reads->query('stock', $shopId)->where('stock_movements.id', $id)->first(), 'Stock updated', 201);
         });
@@ -110,6 +117,8 @@ class ShopkeeperInventoryWriteService
                 $this->incrementProduct($shopId, (int) $data['product_id'], (int) $data['quantity']);
                 $this->recordMovement($shopId, (int) $data['product_id'], 'in', (int) $data['quantity'], DB::table('purchases')->where('id', $purchaseId)->value('invoice_no'));
             }
+
+            ShopkeeperCache::clear($shopId);
 
             return ApiResponse::success($this->reads->query('purchases', $shopId)->where('purchases.id', $purchaseId)->first(), 'Purchase recorded', 201);
         });
@@ -161,6 +170,8 @@ class ShopkeeperInventoryWriteService
                 'invoice_date' => $data['sale_date'],
             ] + $this->context->timestamps());
 
+            ShopkeeperCache::clear($shopId);
+
             return ApiResponse::success($this->reads->query('sales', $shopId)->where('sales.id', $saleId)->first(), 'Sale recorded', 201);
         });
     }
@@ -188,6 +199,8 @@ class ShopkeeperInventoryWriteService
             DB::table('products')->where('id', $product->id)->update(['stock_quantity' => $stock, 'updated_at' => now()]);
             $this->recordMovement($shopId, (int) $product->id, $movement, (int) $data['quantity'], strtoupper($data['type']).'-RETURN');
 
+            ShopkeeperCache::clear($shopId);
+
             return ApiResponse::success($this->reads->query('returns', $shopId)->where('returns.id', $id)->first(), 'Return recorded', 201);
         });
     }
@@ -196,6 +209,7 @@ class ShopkeeperInventoryWriteService
     {
         $this->requireRow($table, $shopId, $id);
         DB::table($table)->where('shop_id', $shopId)->where('id', $id)->update(['deleted_at' => now(), 'updated_at' => now()]);
+        ShopkeeperCache::clear($shopId);
 
         return ApiResponse::success(null, 'Record archived');
     }

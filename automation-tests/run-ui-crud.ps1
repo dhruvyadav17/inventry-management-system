@@ -9,7 +9,7 @@ $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot
 $backend = Join-Path $root "backend-laravel"
 $frontend = Join-Path $root "frontend-react"
-$script = Join-Path $PSScriptRoot "ui-visible-smoke.mjs"
+$script = Join-Path $PSScriptRoot "ui-crud-scenarios.mjs"
 
 function Stop-ProcessTree {
     param([int] $ProcessId)

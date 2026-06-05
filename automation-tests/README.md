@@ -71,3 +71,14 @@ cd C:\xampp\htdocs\project\inventry-management-system
 ```
 
 The visible UI test checks bad login, admin redirect, admin profile navigation, shopkeeper redirect, shopkeeper profile navigation, shopkeeper admin-page denial, and browser console/runtime errors. Screenshots are saved under `automation-tests/reports/`.
+
+## Run Visible UI CRUD Scenarios
+
+This opens Edge/Chrome visibly and performs create, update, archive, and validation flows from the React UI:
+
+```powershell
+cd C:\xampp\htdocs\project\inventry-management-system
+.\automation-tests\run-ui-crud.bat
+```
+
+The CRUD runner covers admin permissions, roles, users, archived filters, shopkeeper suppliers, customers, products, stock movements, purchases, sales, returns, validation failures, and reports after data changes. PNG snapshots are saved under `automation-tests/reports/`.

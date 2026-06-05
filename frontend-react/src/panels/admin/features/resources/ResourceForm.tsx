@@ -59,7 +59,7 @@ export function ResourceForm({ resource, singular, form, errors, roleOptions, pe
   }
 
   return (
-    <form className="resource-form" onSubmit={onSubmit}>
+    <form className="resource-form" onSubmit={onSubmit} data-testid={`admin-${resource}-form`}>
       <div className="modal-header">
         <div>
           <h5 className="modal-title">{form.id ? `Edit ${singular}` : `Create ${singular}`}</h5>
@@ -71,19 +71,19 @@ export function ResourceForm({ resource, singular, form, errors, roleOptions, pe
         <div className="row g-3">
           <div className="col-md-3">
             <label className="form-label">Name</label>
-            <input className={`form-control ${errorFor(errors, 'name') ? 'is-invalid' : ''}`} value={form.name} onChange={(e) => onChange({ ...form, name: e.target.value })} required />
+            <input data-testid={`admin-${resource}-name`} className={`form-control ${errorFor(errors, 'name') ? 'is-invalid' : ''}`} value={form.name} onChange={(e) => onChange({ ...form, name: e.target.value })} required />
             {errorFor(errors, 'name') && <div className="invalid-feedback">{errorFor(errors, 'name')}</div>}
           </div>
           {resource === 'users' && (
             <>
               <div className="col-md-3">
                 <label className="form-label">Email</label>
-                <input className={`form-control ${errorFor(errors, 'email') ? 'is-invalid' : ''}`} type="email" value={form.email} onChange={(e) => onChange({ ...form, email: e.target.value })} required />
+                <input data-testid="admin-users-email" className={`form-control ${errorFor(errors, 'email') ? 'is-invalid' : ''}`} type="email" value={form.email} onChange={(e) => onChange({ ...form, email: e.target.value })} required />
                 {errorFor(errors, 'email') && <div className="invalid-feedback">{errorFor(errors, 'email')}</div>}
               </div>
               <div className="col-md-2">
                 <label className="form-label">Password</label>
-                <input className={`form-control ${errorFor(errors, 'password') ? 'is-invalid' : ''}`} type="password" value={form.password} onChange={(e) => onChange({ ...form, password: e.target.value, password_confirmation: e.target.value })} required={!form.id} />
+                <input data-testid="admin-users-password" className={`form-control ${errorFor(errors, 'password') ? 'is-invalid' : ''}`} type="password" value={form.password} onChange={(e) => onChange({ ...form, password: e.target.value, password_confirmation: e.target.value })} required={!form.id} />
                 {errorFor(errors, 'password') && <div className="invalid-feedback">{errorFor(errors, 'password')}</div>}
               </div>
               <div className="col-md-3">
@@ -91,7 +91,7 @@ export function ResourceForm({ resource, singular, form, errors, roleOptions, pe
                 <div className={`check-list ${errorFor(errors, 'roles') ? 'is-invalid-box' : ''}`}>
                   {roleOptions.map((role) => (
                     <label className="check-item" key={role.id}>
-                      <input type="checkbox" checked={form.roles.includes(role.name)} onChange={() => toggleList('roles', role.name)} />
+                      <input data-testid={`admin-users-role-${role.name}`} type="checkbox" checked={form.roles.includes(role.name)} onChange={() => toggleList('roles', role.name)} />
                       <span>{role.name}</span>
                     </label>
                   ))}
@@ -110,7 +110,7 @@ export function ResourceForm({ resource, singular, form, errors, roleOptions, pe
                     <div>
                       {group.items.map((permission) => (
                         <label className="check-item" key={permission.id}>
-                          <input type="checkbox" checked={form.permissions.includes(permission.name)} onChange={() => toggleList('permissions', permission.name)} />
+                          <input data-testid={`admin-roles-permission-${permission.name}`} type="checkbox" checked={form.permissions.includes(permission.name)} onChange={() => toggleList('permissions', permission.name)} />
                           <span>{permission.name}</span>
                         </label>
                       ))}
@@ -123,7 +123,7 @@ export function ResourceForm({ resource, singular, form, errors, roleOptions, pe
           )}
           <div className="col-md-2">
             <label className="form-label">Status</label>
-            <select className={`form-select ${errorFor(errors, 'status') ? 'is-invalid' : ''}`} value={form.status} onChange={(e) => onChange({ ...form, status: e.target.value as Status })}>
+            <select data-testid={`admin-${resource}-status`} className={`form-select ${errorFor(errors, 'status') ? 'is-invalid' : ''}`} value={form.status} onChange={(e) => onChange({ ...form, status: e.target.value as Status })}>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
@@ -133,7 +133,7 @@ export function ResourceForm({ resource, singular, form, errors, roleOptions, pe
       </div>
       <div className="modal-footer">
         <button type="button" className="btn btn-outline-secondary" onClick={onCancel}>Cancel</button>
-        <button className="btn btn-success"><i className="bi bi-check2 me-1" /> Save</button>
+        <button data-testid={`admin-${resource}-save`} className="btn btn-success"><i className="bi bi-check2 me-1" /> Save</button>
       </div>
     </form>
   );

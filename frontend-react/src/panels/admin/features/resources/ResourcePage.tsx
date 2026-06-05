@@ -40,7 +40,7 @@ export function ResourcePage({ resource }: { resource: ResourceName }) {
     title,
     config,
   } = useResourceRecords(resource);
-  const { roles, permissions } = useResourceOptions();
+  const { roles, permissions, loadOptions } = useResourceOptions();
   const canRestore = useCan(`${resource}.restore`);
   const canUpdate = useCan(`${resource}.update`);
   const canDelete = useCan(`${resource}.delete`);
@@ -65,6 +65,7 @@ export function ResourcePage({ resource }: { resource: ResourceName }) {
       setForm(emptyResourceForm);
       setFormOpen(false);
       await load();
+      loadOptions();
       Swal.fire('Saved', `${config.singular} saved successfully.`, 'success');
     } catch (error) {
       const validationErrors = getValidationErrors(error);
@@ -96,12 +97,14 @@ export function ResourcePage({ resource }: { resource: ResourceName }) {
   }
 
   function openCreateForm() {
+    loadOptions();
     setForm(emptyResourceForm);
     setFormErrors({});
     setFormOpen(true);
   }
 
   function openEditForm(row: typeof rows[number]) {
+    loadOptions();
     setFormErrors({});
     setForm({ ...emptyResourceForm, id: row.id, name: row.name, email: row.email ?? '', status: row.status, roles: row.roles ?? [], permissions: row.permissions ?? [] });
     setFormOpen(true);
@@ -119,7 +122,7 @@ export function ResourcePage({ resource }: { resource: ResourceName }) {
         title={title}
         action={(
           <Can permission={`${resource}.create`}>
-            <button className="btn btn-primary" onClick={openCreateForm}>
+            <button data-testid={`admin-${resource}-new`} className="btn btn-primary" onClick={openCreateForm}>
               <i className="bi bi-plus-lg me-1" /> New
             </button>
           </Can>
@@ -129,7 +132,7 @@ export function ResourcePage({ resource }: { resource: ResourceName }) {
       {formOpen && (
         <>
           <div className="modal-backdrop fade show" />
-          <div className="modal admin-modal d-block" tabIndex={-1} role="dialog" aria-modal="true">
+          <div className="modal admin-modal d-block" tabIndex={-1} role="dialog" aria-modal="true" data-testid={`admin-${resource}-modal`}>
             <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
               <div className="modal-content">
                 <ResourceForm resource={resource} singular={config.singular} form={form} errors={formErrors} roleOptions={roles} permissionOptions={permissions} onCancel={closeForm} onChange={(value) => { setForm(value); setFormErrors({}); }} onSubmit={save} />
@@ -145,7 +148,7 @@ export function ResourcePage({ resource }: { resource: ResourceName }) {
 
       <Panel title={`${title} List`} subtitle={`${pagination?.total ?? rows.length} records`}>
         <div className="table-responsive">
-          <table className="table table-hover resource-table mb-0">
+          <table className="table table-hover resource-table mb-0" data-testid={`admin-${resource}-table`}>
             <thead>
               <tr>
                 <th><button className="table-sort" onClick={() => sort('id')}>ID {sortBy === 'id' && <i className={`bi bi-arrow-${sortDir === 'asc' ? 'up' : 'down'}`} />}</button></th>
@@ -181,10 +184,10 @@ export function ResourcePage({ resource }: { resource: ResourceName }) {
                       canUpdate || canDelete ? (
                         <>
                         <Can permission={`${resource}.update`}>
-                          <IconButton icon="bi-pencil" className="me-1" title="Edit" aria-label={`Edit ${row.name}`} onClick={() => openEditForm(row)} />
+                          <IconButton icon="bi-pencil" className="me-1" title="Edit" aria-label={`Edit ${row.name}`} data-testid={`admin-${resource}-edit-${row.id}`} onClick={() => openEditForm(row)} />
                         </Can>
                         <Can permission={`${resource}.delete`}>
-                          <IconButton icon="bi-archive" tone="danger" title="Archive" aria-label={`Archive ${row.name}`} onClick={() => remove(row.id)} />
+                          <IconButton icon="bi-archive" tone="danger" title="Archive" aria-label={`Archive ${row.name}`} data-testid={`admin-${resource}-archive-${row.id}`} onClick={() => remove(row.id)} />
                         </Can>
                         </>
                       ) : (

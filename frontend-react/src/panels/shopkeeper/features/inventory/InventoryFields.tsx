@@ -112,7 +112,7 @@ function Text({ field, label, type = 'text', form, errors, onChange }: { field: 
   return (
     <label className="shop-form-field">
       <span>{label}</span>
-      <input className={`form-control ${errors[field] ? 'is-invalid' : ''}`} type={type} value={form[field] ?? ''} onChange={(event) => onChange(field, event.target.value)} step={type === 'number' ? '0.01' : undefined} />
+      <input data-testid={`shop-field-${field}`} className={`form-control ${errors[field] ? 'is-invalid' : ''}`} type={type} value={form[field] ?? ''} onChange={(event) => onChange(field, event.target.value)} step={type === 'number' ? '0.01' : undefined} />
       {errors[field] && <small>{errors[field][0]}</small>}
     </label>
   );
@@ -122,7 +122,7 @@ function Select({ field, label, form, errors, options, onChange, emptyLabel = 'S
   return (
     <label className="shop-form-field">
       <span>{label}</span>
-      <select className={`form-select ${errors[field] ? 'is-invalid' : ''}`} value={form[field] ?? ''} onChange={(event) => onChange(field, event.target.value)}>
+      <select data-testid={`shop-field-${field}`} className={`form-select ${errors[field] ? 'is-invalid' : ''}`} value={form[field] ?? ''} onChange={(event) => onChange(field, event.target.value)}>
         <option value="">{emptyLabel}</option>
         {options.map((option) => (
           <option value={valueByName ? option.name : option.id} key={`${field}-${option.id}-${option.name}`}>
