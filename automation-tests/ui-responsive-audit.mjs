@@ -139,6 +139,11 @@ async function setViewport(cdp, viewport) {
 async function navigate(cdp, path) {
   await cdp.send('Page.navigate', { url: `${frontendUrl}${path}` });
   await sleep(1400);
+  await waitFor(cdp, `
+    !document.body.innerText.includes('Loading API data...')
+      && !document.body.innerText.includes('Loading records...')
+      && document.body.innerText.trim() !== 'Loading...'
+  `, 10000);
 }
 
 async function waitFor(cdp, expression, timeoutMs = 12000) {

@@ -849,11 +849,21 @@ body {
   gap: 8px;
   min-height: 40px;
   padding: 0 14px;
+  border: 0;
   border-radius: 6px;
   color: #fff;
   background: #ff9f43;
   font-weight: 800;
   text-decoration: none;
+}
+
+.shop-title-action:focus,
+.shop-title-action:focus-visible,
+.shop-action-btn:focus,
+.shop-action-btn:focus-visible {
+  outline: 3px solid rgba(255, 159, 67, .28);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(255, 159, 67, .16);
 }
 
 .shop-summary-grid,
@@ -1726,11 +1736,12 @@ body {
   .content-header,
   .content-wrapper,
   .app-footer {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .content-header {
+    min-height: 58px;
     grid-template-columns: 40px 1fr auto;
   }
 
@@ -1743,7 +1754,7 @@ body {
   }
 
   .page-title {
-    font-size: 24px;
+    font-size: 22px;
   }
 
   .page-subtitle {
@@ -1751,12 +1762,16 @@ body {
   }
 
   .metric-card {
-    min-height: 96px;
-    padding: 16px;
+    min-height: 82px;
+    padding: 14px;
   }
 
   .metric-card strong {
-    font-size: 30px;
+    font-size: 26px;
+  }
+
+  .metric-card i {
+    font-size: 34px;
   }
 
   .panel-card .card-header {
@@ -1783,11 +1798,12 @@ body {
   }
 
   .shopkeeper-content {
-    padding: 14px;
+    padding: 12px;
   }
 
   .shopkeeper-topbar {
-    padding: 10px 14px;
+    min-height: 58px;
+    padding: 8px 12px;
   }
 
   .shopkeeper-search {
@@ -1810,6 +1826,16 @@ body {
   .shop-page-title {
     align-items: flex-start;
     flex-direction: column;
+    gap: 10px;
+  }
+
+  .shop-page-title h1 {
+    font-size: 22px;
+  }
+
+  .shop-title-action {
+    min-height: 38px;
+    padding: 0 12px;
   }
 
   .shop-chart {
@@ -1825,6 +1851,28 @@ body {
   .shop-form-row,
   .shop-search-form {
     grid-template-columns: 1fr;
+  }
+
+  .shop-form,
+  .shop-panel-head {
+    padding: 14px;
+  }
+
+  .shop-form-field {
+    gap: 5px;
+  }
+
+  .shop-form-field span,
+  .form-label {
+    font-size: 12px;
+  }
+
+  .shop-form-field .form-control,
+  .shop-form-field .form-select,
+  .resource-form .form-control,
+  .resource-form .form-select {
+    min-height: 40px;
+    font-size: 14px;
   }
 }
 
@@ -1860,7 +1908,8 @@ body {
 
   .shop-summary-card,
   .shop-color-card {
-    min-height: 78px;
+    min-height: 72px;
+    padding: 14px;
   }
 
   .shop-chart-legend {
