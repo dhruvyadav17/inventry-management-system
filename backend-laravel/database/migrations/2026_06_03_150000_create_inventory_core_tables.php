@@ -39,6 +39,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
+            $table->text('address')->nullable();
             $table->decimal('opening_balance', 12, 2)->default(0);
             $table->string('status')->default('active')->index();
             $table->softDeletes();
