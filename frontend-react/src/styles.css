@@ -818,6 +818,11 @@ body {
   background: #ff9f43;
 }
 
+.shop-action-btn:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
 .shopkeeper-content {
   flex: 1;
   padding: 20px 22px 28px;
@@ -1322,7 +1327,7 @@ body {
 
 .shop-search-form {
   display: grid;
-  grid-template-columns: minmax(160px, 240px) repeat(2, 42px);
+  grid-template-columns: minmax(160px, 240px) repeat(3, 42px);
   gap: 8px;
 }
 
@@ -1349,6 +1354,12 @@ body {
 .shop-form-summary strong {
   color: #111827;
   font-size: 20px;
+}
+
+.shop-report-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
 }
 
 .shop-row-actions {
@@ -1849,7 +1860,7 @@ body {
     padding: 0 10px;
   }
 
-  .shop-action-btn:not(.primary) {
+  .shopkeeper-actions .shop-action-btn:not(.primary) {
     display: none;
   }
 

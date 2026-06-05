@@ -1,9 +1,14 @@
+import { exportReportPayload } from './inventoryCsv';
 import { money } from './inventoryUtils';
 import { InventoryRowsTable } from './InventoryRowsTable';
 import type { ReportPayload } from './inventoryTypes';
 
 export function InventoryReportsView({ report, loading }: { report: ReportPayload; loading: boolean }) {
   const summary = report.summary ?? {};
+  const hasReportData = Object.keys(summary).length > 0
+    || Boolean(report.low_stock_products?.length)
+    || Boolean(report.recent_sales?.length)
+    || Boolean(report.recent_purchases?.length);
   const cards = [
     ['Total Sales', summary.total_sales],
     ['Total Purchases', summary.total_purchases],
@@ -19,6 +24,17 @@ export function InventoryReportsView({ report, loading }: { report: ReportPayloa
 
   return (
     <>
+      <section className="shop-report-toolbar">
+        <button
+          data-testid="shop-reports-export"
+          className="shop-action-btn"
+          type="button"
+          disabled={!hasReportData}
+          onClick={() => exportReportPayload(report)}
+        >
+          <i className="bi bi-download" /> Export
+        </button>
+      </section>
       <section className="shop-summary-grid">
         {cards.map(([label, value]) => (
           <div className="shop-summary-card" key={label}>

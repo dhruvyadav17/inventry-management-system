@@ -188,6 +188,25 @@ async function waitFor(cdp, label, expression, timeoutMs = 15000) {
   return false;
 }
 
+async function waitForShopListReady(cdp, resource) {
+  await waitFor(cdp, `shop ${resource} list ready`, `
+    (() => {
+      const table = document.querySelector('[data-testid="shop-${resource}-table"]');
+      const text = document.body.innerText;
+      return Boolean(table && !text.includes('Loading records...') && !text.includes('Loading API data...'));
+    })()
+  `);
+}
+
+async function waitForShopReportReady(cdp) {
+  await waitFor(cdp, 'shop reports ready', `
+    (() => {
+      const button = document.querySelector('[data-testid="shop-reports-export"]');
+      return Boolean(button && !document.body.innerText.includes('Loading report...'));
+    })()
+  `);
+}
+
 async function check(cdp, label, condition, details = '') {
   if (condition) {
     console.log(`PASS ${label}`);
@@ -325,6 +344,7 @@ async function shopSearchFor(cdp, resource, text) {
   await fill(cdp, `[data-testid="shop-${resource}-search"]`, text);
   await click(cdp, `[data-testid="shop-${resource}-apply-search"]`);
   await waitFor(cdp, `shop ${resource} search ${text}`, `document.body.innerText.includes(${JSON.stringify(text)})`);
+  await waitForShopListReady(cdp, resource);
 }
 
 async function adminCreatePermission(cdp, name) {
@@ -536,14 +556,15 @@ async function shopTransactions(cdp) {
 
 async function archiveFirstShopRow(cdp, resource, searchText) {
   await navigate(cdp, `/shopkeeper/${resource}`);
+  await waitForShopListReady(cdp, resource);
   await fill(cdp, `[data-testid="shop-${resource}-search"]`, searchText);
   await click(cdp, `[data-testid="shop-${resource}-apply-search"]`);
-  await sleep(slowMs * 2);
+  await waitForShopListReady(cdp, resource);
   await evaluate(cdp, `[...document.querySelectorAll('[data-testid^="shop-${resource}-archive-"]')][0]?.click(); true;`);
   await sleep(slowMs * 2);
   await fill(cdp, `[data-testid="shop-${resource}-search"]`, searchText);
   await click(cdp, `[data-testid="shop-${resource}-apply-search"]`);
-  await sleep(slowMs * 2);
+  await waitForShopListReady(cdp, resource);
   await check(cdp, `shop ${resource} archived from UI`, await evaluate(cdp, `
     document.body.innerText.includes('Record archived.')
       || document.body.innerText.includes('No records found')
@@ -592,12 +613,28 @@ async function run() {
     const customerName = await shopCreateCustomer(cdp);
     const product = await shopCreateProduct(cdp);
     await shopTransactions(cdp);
+    await navigate(cdp, '/shopkeeper/products');
+    await waitForShopListReady(cdp, 'products');
+    await check(cdp, 'shopkeeper products export available', await evaluate(cdp, `
+      (() => {
+        const button = document.querySelector('[data-testid="shop-products-export"]');
+        return Boolean(button && button.offsetParent !== null && !button.disabled);
+      })()
+    `));
+    await snapshot(cdp, 'shopkeeper-products-export');
     await archiveFirstShopRow(cdp, 'products', product.sku);
     await archiveFirstShopRow(cdp, 'customers', customerName);
     await archiveFirstShopRow(cdp, 'suppliers', supplierName);
 
     await navigate(cdp, '/shopkeeper/reports');
+    await waitForShopReportReady(cdp);
     await check(cdp, 'shopkeeper reports still render after CRUD', await evaluate(cdp, `document.body.innerText.includes('Reports')`));
+    await check(cdp, 'shopkeeper reports export available', await evaluate(cdp, `
+      (() => {
+        const button = document.querySelector('[data-testid="shop-reports-export"]');
+        return Boolean(button && button.offsetParent !== null && !button.disabled);
+      })()
+    `));
     await snapshot(cdp, 'shopkeeper-reports-after-crud');
 
     if (browserLogs.length) {

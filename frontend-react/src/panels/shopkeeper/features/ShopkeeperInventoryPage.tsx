@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { api, apiGet, apiPage, getApiErrorMessage, getValidationErrors, toRows } from '@common/services/api';
 import { editableResources, emptyOptions, initialForms, resourceEndpoints, resourceTitles } from './inventory/inventoryConfig';
+import { exportResourceRows } from './inventory/inventoryCsv';
 import { fromRow, normalizePayload } from './inventory/inventoryUtils';
 import { InventoryFields } from './inventory/InventoryFields';
 import { InventoryFormSummary } from './inventory/InventoryFormSummary';
@@ -25,6 +26,7 @@ export function ShopkeeperInventoryPage({ resource }: { resource: ShopkeeperReso
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
   const canWrite = resource !== 'reports';
+  const canExportRows = resource !== 'reports' && rows.length > 0 && !loading;
   const filteredProducts = useMemo(() => options.products.filter((product) => product.name), [options.products]);
   const selectedProduct = filteredProducts.find((product) => String(product.id) === form.product_id);
 
@@ -181,6 +183,15 @@ export function ShopkeeperInventoryPage({ resource }: { resource: ShopkeeperReso
                 <input data-testid={`shop-${resource}-search`} className="form-control" value={search} placeholder="Search" onChange={(event) => setSearch(event.target.value)} />
                 <button data-testid={`shop-${resource}-apply-search`} className="shop-action-btn" type="submit"><i className="bi bi-search" /></button>
                 {search && <button className="shop-action-btn" type="button" onClick={() => { setSearch(''); loadRows(''); }}><i className="bi bi-x-lg" /></button>}
+                <button
+                  data-testid={`shop-${resource}-export`}
+                  className="shop-action-btn"
+                  type="button"
+                  disabled={!canExportRows}
+                  onClick={() => exportResourceRows(resource as Exclude<ShopkeeperResource, 'reports'>, rows)}
+                >
+                  <i className="bi bi-download" />
+                </button>
               </form>
             </div>
             <InventoryRowsTable resource={resource} rows={rows} loading={loading} onEdit={edit} onArchive={archive} />
