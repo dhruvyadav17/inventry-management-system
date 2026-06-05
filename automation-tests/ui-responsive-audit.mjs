@@ -201,6 +201,23 @@ async function recordCheck(cdp, label, expression, detailsExpression = 'location
   }
 }
 
+function sidebarBoundsCheck(shellSelector, sidebarSelector) {
+  return `
+    (() => {
+      const shell = document.querySelector(${JSON.stringify(shellSelector)});
+      const sidebar = document.querySelector(${JSON.stringify(sidebarSelector)});
+      const rect = sidebar?.getBoundingClientRect();
+      return Boolean(
+        shell?.classList.contains('sidebar-open')
+          && rect
+          && rect.left >= -2
+          && rect.right <= window.innerWidth + 2
+          && rect.width >= Math.min(220, window.innerWidth - 60)
+      );
+    })()
+  `;
+}
+
 async function responsiveChecks(cdp, label) {
   await recordCheck(cdp, `${label} no body horizontal overflow`, `
     document.documentElement.scrollWidth <= window.innerWidth + 4
@@ -248,7 +265,7 @@ async function auditViewport(cdp, viewport) {
     await navigate(cdp, '/users');
     await click(cdp, '[data-testid="admin-menu-toggle"]');
     await snapshot(cdp, `${viewport.name}-admin-sidebar-open`);
-    await recordCheck(cdp, `${viewport.name} admin sidebar opens`, `document.querySelector('.app-shell')?.classList.contains('sidebar-open')`);
+    await recordCheck(cdp, `${viewport.name} admin sidebar opens within viewport`, sidebarBoundsCheck('.app-shell', '.app-sidebar'));
   }
 
   await navigate(cdp, '/users');
@@ -282,7 +299,7 @@ async function auditViewport(cdp, viewport) {
     await navigate(cdp, '/shopkeeper/products');
     await click(cdp, '[data-testid="shop-menu-toggle"]');
     await snapshot(cdp, `${viewport.name}-shop-sidebar-open`);
-    await recordCheck(cdp, `${viewport.name} shop sidebar opens`, `document.querySelector('.shopkeeper-shell')?.classList.contains('sidebar-open')`);
+    await recordCheck(cdp, `${viewport.name} shop sidebar opens within viewport`, sidebarBoundsCheck('.shopkeeper-shell', '.shopkeeper-rail'));
   }
 
   await navigate(cdp, '/shopkeeper/products');
