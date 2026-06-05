@@ -21,6 +21,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['auditable_type', 'auditable_id']);
+            $table->index(['created_at', 'id'], 'audit_logs_created_id_idx');
+            $table->index(['action', 'created_at'], 'audit_logs_action_created_idx');
         });
     }
 

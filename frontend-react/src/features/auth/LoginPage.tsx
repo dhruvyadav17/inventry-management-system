@@ -2,9 +2,9 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { useAppDispatch } from '../../app/hooks';
-import { api, getApiErrorMessage, type ApiEnvelope } from '../../services/api';
-import type { AuthUser } from '../../types';
+import { useAppDispatch } from '@app/hooks';
+import { api, getApiErrorMessage, type ApiEnvelope } from '@common/services/api';
+import type { AuthUser } from '@common/types';
 import { setCredentials } from './authSlice';
 
 type LoginResponse = {

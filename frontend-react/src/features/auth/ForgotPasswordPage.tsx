@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { api, getApiErrorMessage, getValidationErrors } from '../../services/api';
+import { api, getApiErrorMessage, getValidationErrors } from '@common/services/api';
 
 export function ForgotPasswordPage() {
   const [email, setEmail] = useState('');

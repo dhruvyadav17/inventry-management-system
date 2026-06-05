@@ -8,6 +8,15 @@
   --page: #f3f6fa;
 }
 
+.app-route-loader {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 700;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -1303,8 +1312,33 @@ body {
 
 .shop-search-form {
   display: grid;
-  grid-template-columns: minmax(160px, 240px) 42px;
+  grid-template-columns: minmax(160px, 240px) repeat(2, 42px);
   gap: 8px;
+}
+
+.shop-search-form .shop-action-btn:last-child:nth-child(2) {
+  grid-column: 2;
+}
+
+.shop-form-summary {
+  display: grid;
+  gap: 3px;
+  padding: 12px;
+  border: 1px solid #dbeafe;
+  border-radius: 6px;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+.shop-form-summary span,
+.shop-form-summary small {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.shop-form-summary strong {
+  color: #111827;
+  font-size: 20px;
 }
 
 .shop-row-actions {

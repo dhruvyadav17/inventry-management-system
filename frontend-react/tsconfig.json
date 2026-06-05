@@ -5,6 +5,15 @@
     "lib": ["ES2023", "DOM"],
     "jsx": "react-jsx",
     "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@auth/*": ["src/features/auth/*"],
+      "@common/*": ["src/common/*"],
+      "@admin/*": ["src/panels/admin/*"],
+      "@shopkeeper/*": ["src/panels/shopkeeper/*"]
+    },
+    "ignoreDeprecations": "6.0",
     "skipLibCheck": true,
 
     /* Bundler mode */

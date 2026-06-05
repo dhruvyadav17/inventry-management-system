@@ -1,8 +1,14 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+foreach (config('maintenance.schedule', []) as $job) {
+    $event = Schedule::command($job['command']);
+    $frequency = $job['frequency'] ?? 'daily';
+
+    method_exists($event, $frequency) ? $event->{$frequency}() : $event->daily();
+
+    if ($job['without_overlapping'] ?? true) {
+        $event->withoutOverlapping();
+    }
+}

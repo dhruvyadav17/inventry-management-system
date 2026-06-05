@@ -13,12 +13,12 @@ class ShopkeeperCache
 
     public static function ttl(string $name): int
     {
-        return (int) config("admin.shopkeeper_cache_ttl.{$name}", 60);
+        return (int) config("shopkeeper.cache_ttl.{$name}", 60);
     }
 
     public static function clear(int $shopId): void
     {
-        foreach (['dashboard', 'options', 'reports'] as $name) {
+        foreach (array_keys(config('shopkeeper.cache_ttl', [])) as $name) {
             Cache::forget(self::key($name, $shopId));
         }
     }

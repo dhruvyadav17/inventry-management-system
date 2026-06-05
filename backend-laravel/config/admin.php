@@ -7,10 +7,8 @@ return [
         'options' => env('ADMIN_OPTIONS_CACHE_TTL', 300),
     ],
 
-    'shopkeeper_cache_ttl' => [
-        'dashboard' => env('SHOPKEEPER_DASHBOARD_CACHE_TTL', 45),
-        'options' => env('SHOPKEEPER_OPTIONS_CACHE_TTL', 300),
-        'reports' => env('SHOPKEEPER_REPORTS_CACHE_TTL', 60),
+    'dashboard_limits' => [
+        'recent_audits' => env('ADMIN_DASHBOARD_RECENT_AUDITS', 10),
     ],
 
     'settings_defaults' => [

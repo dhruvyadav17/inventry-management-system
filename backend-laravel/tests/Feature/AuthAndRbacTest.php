@@ -323,7 +323,7 @@ class AuthAndRbacTest extends TestCase
 
         $this->assertSame(8, DB::table('products')->where('id', $productId)->value('stock_quantity'));
 
-        $this->actingAs($user, 'sanctum')
+        $saleTotal = $this->actingAs($user, 'sanctum')
             ->postJson('/api/v1/shopkeeper/sales', [
                 'product_id' => $productId,
                 'sale_date' => now()->toDateString(),
@@ -333,9 +333,18 @@ class AuthAndRbacTest extends TestCase
                 'payment_status' => 'paid',
             ])
             ->assertCreated()
-            ->assertJsonPath('data.total_amount', 280);
+            ->json('data.total_amount');
+
+        $this->assertSame(280.0, (float) $saleTotal);
 
         $this->assertSame(6, DB::table('products')->where('id', $productId)->value('stock_quantity'));
+
+        $this->actingAs($user, 'sanctum')
+            ->getJson('/api/v1/shopkeeper/dashboard')
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.stats.sales_invoice_count', 1)
+            ->assertJsonStructure(['data' => ['stats' => ['purchase_due', 'sales_due', 'stock_value'], 'chart', 'products', 'low_stock_products']]);
 
         $this->actingAs($user, 'sanctum')
             ->getJson('/api/v1/shopkeeper/reports')

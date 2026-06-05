@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import { api, getApiErrorMessage, getValidationErrors } from '../../services/api';
+import { api, getApiErrorMessage, getValidationErrors } from '@common/services/api';
 
 export function ResetPasswordPage() {
   const navigate = useNavigate();

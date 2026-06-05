@@ -87,6 +87,7 @@ class DatabaseSeeder extends Seeder
         $shopkeeper->shops()->syncWithoutDetaching([$demoShop->id => ['is_primary' => true, 'status' => 'active']]);
 
         $this->seedInventory($demoShop->id);
+        $this->call(LargeInventorySeeder::class);
 
         foreach (range(1, 10) as $index) {
             User::updateOrCreate([
