@@ -39,7 +39,7 @@ export function ShopkeeperLayout() {
       <button className="sidebar-backdrop" aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} />
       <main className="shopkeeper-main">
         <header className="shopkeeper-topbar">
-          <button className="icon-btn menu-toggle" title="Menu" onClick={() => setSidebarOpen(true)}><i className="bi bi-list" /></button>
+          <button data-testid="shop-menu-toggle" className="icon-btn menu-toggle" title="Menu" onClick={() => setSidebarOpen(true)}><i className="bi bi-list" /></button>
           <div className="shopkeeper-search">
             <i className="bi bi-search" />
             <span>Search product, invoice, customer</span>

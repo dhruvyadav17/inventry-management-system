@@ -82,3 +82,21 @@ cd C:\xampp\htdocs\project\inventry-management-system
 ```
 
 The CRUD runner covers admin permissions, roles, users, archived filters, shopkeeper suppliers, customers, products, stock movements, purchases, sales, returns, validation failures, and reports after data changes. PNG snapshots are saved under `automation-tests/reports/`.
+
+## Run API Validation, Security, And Performance Audit
+
+```powershell
+cd C:\xampp\htdocs\project\inventry-management-system
+.\automation-tests\run-api-audit.bat
+```
+
+This checks security headers, bad tokens, role boundaries, validation failures, injection-like searches, pagination caps, and response-time budgets. A JSON report is saved under `automation-tests/reports/`.
+
+## Run Responsive UI Audit
+
+```powershell
+cd C:\xampp\htdocs\project\inventry-management-system
+.\automation-tests\run-ui-responsive.bat
+```
+
+This opens Edge/Chrome visibly and captures desktop, tablet, and mobile snapshots for login, popups, sidebars, profile dropdowns, admin pages, shopkeeper pages, and modal/form layouts. A JSON finding report is saved under `automation-tests/reports/`.

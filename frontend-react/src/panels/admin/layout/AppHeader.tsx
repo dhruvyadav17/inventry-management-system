@@ -20,7 +20,7 @@ export function AppHeader({ onMenuClick }: { onMenuClick: () => void }) {
   return (
     <header className="content-header">
       <div className="header-left">
-        <button className="icon-btn menu-toggle" title="Menu" onClick={onMenuClick}><i className="bi bi-list" /></button>
+        <button data-testid="admin-menu-toggle" className="icon-btn menu-toggle" title="Menu" onClick={onMenuClick}><i className="bi bi-list" /></button>
       </div>
       <HeaderStatusStrip />
       <div className="top-actions">

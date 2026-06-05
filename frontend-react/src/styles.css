@@ -1489,6 +1489,8 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  min-width: 30px;
+  min-height: 30px;
   padding: 0;
   border: 0;
   color: inherit;
@@ -1496,6 +1498,11 @@ body {
   font: inherit;
   font-weight: inherit;
   text-transform: inherit;
+}
+
+.resource-table .btn-sm {
+  min-width: 34px;
+  min-height: 34px;
 }
 
 .empty-cell {

@@ -544,7 +544,11 @@ async function archiveFirstShopRow(cdp, resource, searchText) {
   await fill(cdp, `[data-testid="shop-${resource}-search"]`, searchText);
   await click(cdp, `[data-testid="shop-${resource}-apply-search"]`);
   await sleep(slowMs * 2);
-  await check(cdp, `shop ${resource} archived from UI`, await evaluate(cdp, `document.body.innerText.includes('Record archived.') || !document.body.innerText.includes(${JSON.stringify(searchText)}) || document.body.innerText.includes('No records found')`));
+  await check(cdp, `shop ${resource} archived from UI`, await evaluate(cdp, `
+    document.body.innerText.includes('Record archived.')
+      || document.body.innerText.includes('No records found')
+      || document.querySelectorAll('[data-testid^="shop-${resource}-archive-"]').length === 0
+  `));
   await snapshot(cdp, `shop-${resource}-archived`);
 }
 
