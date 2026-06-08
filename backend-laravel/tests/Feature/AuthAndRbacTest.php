@@ -249,6 +249,38 @@ class AuthAndRbacTest extends TestCase
             ->assertJsonStructure(['data' => ['data', 'links', 'meta' => ['current_page', 'last_page', 'per_page', 'total']]]);
     }
 
+    public function test_admin_mutations_create_audit_and_activity_entries(): void
+    {
+        foreach (['roles.create', 'logs.view'] as $permission) {
+            Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web'], ['status' => 'active']);
+        }
+
+        $role = Role::create(['name' => 'admin-logger', 'guard_name' => 'web', 'status' => 'active']);
+        $role->givePermissionTo(['roles.create', 'logs.view']);
+        $user = User::factory()->create(['status' => 'active']);
+        $user->assignRole($role);
+
+        $createdRoleId = $this->actingAs($user, 'sanctum')
+            ->postJson('/api/v1/roles', ['name' => 'logged-role', 'status' => 'active', 'permissions' => []])
+            ->assertCreated()
+            ->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'user_id' => $user->id,
+            'action' => 'roles.created',
+            'auditable_type' => Role::class,
+            'auditable_id' => $createdRoleId,
+        ]);
+
+        $this->assertDatabaseHas('activity_log', [
+            'event' => 'roles.created',
+            'causer_type' => User::class,
+            'causer_id' => $user->id,
+            'subject_type' => Role::class,
+            'subject_id' => $createdRoleId,
+        ]);
+    }
+
     public function test_role_and_permission_crud_flow(): void
     {
         foreach (['roles.create', 'roles.view', 'roles.update', 'roles.delete', 'roles.restore', 'permissions.create', 'permissions.view', 'permissions.update', 'permissions.delete', 'permissions.restore'] as $permission) {

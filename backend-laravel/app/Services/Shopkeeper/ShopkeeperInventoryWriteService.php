@@ -2,6 +2,7 @@
 
 namespace App\Services\Shopkeeper;
 
+use App\Services\AuditLogger;
 use App\Support\ApiResponse;
 use App\Support\ShopkeeperCache;
 use Illuminate\Http\JsonResponse;
@@ -13,6 +14,7 @@ class ShopkeeperInventoryWriteService
     public function __construct(
         private readonly ShopkeeperInventoryContext $context,
         private readonly ShopkeeperInventoryReadService $reads,
+        private readonly AuditLogger $audit,
     ) {
     }
 
@@ -24,6 +26,7 @@ class ShopkeeperInventoryWriteService
 
         $id = DB::table('products')->insertGetId($data + $this->context->timestamps());
         ShopkeeperCache::clear($shopId);
+        $this->audit->record('shopkeeper.products.created', 'products', $id, null, $this->rowArray('products', $id));
 
         return ApiResponse::success($this->reads->query('products', $shopId)->where('products.id', $id)->first(), 'Product created', 201);
     }
@@ -31,11 +34,13 @@ class ShopkeeperInventoryWriteService
     public function updateProduct(array $data, int $shopId, int $id): JsonResponse
     {
         $this->requireRow('products', $shopId, $id);
+        $oldValues = $this->rowArray('products', $id);
         $data['category_id'] = $this->categoryId($shopId, $data['category_id'] ?? null, $data['category_name'] ?? null);
         unset($data['category_name']);
 
         DB::table('products')->where('shop_id', $shopId)->where('id', $id)->update($data + ['updated_at' => now()]);
         ShopkeeperCache::clear($shopId);
+        $this->audit->record('shopkeeper.products.updated', 'products', $id, $oldValues, $this->rowArray('products', $id));
 
         return ApiResponse::success($this->reads->query('products', $shopId)->where('products.id', $id)->first(), 'Product updated');
     }
@@ -45,6 +50,7 @@ class ShopkeeperInventoryWriteService
         $data['shop_id'] = $shopId;
         $id = DB::table($table)->insertGetId($data + $this->context->timestamps());
         ShopkeeperCache::clear($shopId);
+        $this->audit->record("shopkeeper.{$table}.created", $table, $id, null, $this->rowArray($table, $id));
 
         return ApiResponse::success($this->reads->query($table, $shopId)->where("{$table}.id", $id)->first(), ucfirst(rtrim($table, 's')).' created', 201);
     }
@@ -52,8 +58,10 @@ class ShopkeeperInventoryWriteService
     public function updateParty(string $table, array $data, int $shopId, int $id): JsonResponse
     {
         $this->requireRow($table, $shopId, $id);
+        $oldValues = $this->rowArray($table, $id);
         DB::table($table)->where('shop_id', $shopId)->where('id', $id)->update($data + ['updated_at' => now()]);
         ShopkeeperCache::clear($shopId);
+        $this->audit->record("shopkeeper.{$table}.updated", $table, $id, $oldValues, $this->rowArray($table, $id));
 
         return ApiResponse::success($this->reads->query($table, $shopId)->where("{$table}.id", $id)->first(), ucfirst(rtrim($table, 's')).' updated');
     }
@@ -80,6 +88,7 @@ class ShopkeeperInventoryWriteService
             ] + $this->context->timestamps());
 
             ShopkeeperCache::clear($shopId);
+            $this->audit->record('shopkeeper.stock.created', 'stock_movements', $id, ['stock_quantity' => $product->stock_quantity], $this->rowArray('stock_movements', $id) + ['stock_quantity' => $stock]);
 
             return ApiResponse::success($this->reads->query('stock', $shopId)->where('stock_movements.id', $id)->first(), 'Stock updated', 201);
         });
@@ -119,6 +128,7 @@ class ShopkeeperInventoryWriteService
             }
 
             ShopkeeperCache::clear($shopId);
+            $this->audit->record('shopkeeper.purchases.created', 'purchases', $purchaseId, null, $this->rowArray('purchases', $purchaseId));
 
             return ApiResponse::success($this->reads->query('purchases', $shopId)->where('purchases.id', $purchaseId)->first(), 'Purchase recorded', 201);
         });
@@ -171,6 +181,7 @@ class ShopkeeperInventoryWriteService
             ] + $this->context->timestamps());
 
             ShopkeeperCache::clear($shopId);
+            $this->audit->record('shopkeeper.sales.created', 'sales', $saleId, ['stock_quantity' => $product->stock_quantity], $this->rowArray('sales', $saleId) + ['stock_quantity' => $stock]);
 
             return ApiResponse::success($this->reads->query('sales', $shopId)->where('sales.id', $saleId)->first(), 'Sale recorded', 201);
         });
@@ -200,6 +211,7 @@ class ShopkeeperInventoryWriteService
             $this->recordMovement($shopId, (int) $product->id, $movement, (int) $data['quantity'], strtoupper($data['type']).'-RETURN');
 
             ShopkeeperCache::clear($shopId);
+            $this->audit->record('shopkeeper.returns.created', 'returns', $id, ['stock_quantity' => $product->stock_quantity], $this->rowArray('returns', $id) + ['stock_quantity' => $stock]);
 
             return ApiResponse::success($this->reads->query('returns', $shopId)->where('returns.id', $id)->first(), 'Return recorded', 201);
         });
@@ -208,8 +220,10 @@ class ShopkeeperInventoryWriteService
     public function archiveRow(string $table, int $shopId, int $id): JsonResponse
     {
         $this->requireRow($table, $shopId, $id);
+        $oldValues = $this->rowArray($table, $id);
         DB::table($table)->where('shop_id', $shopId)->where('id', $id)->update(['deleted_at' => now(), 'updated_at' => now()]);
         ShopkeeperCache::clear($shopId);
+        $this->audit->record("shopkeeper.{$table}.archived", $table, $id, $oldValues, $this->rowArray($table, $id));
 
         return ApiResponse::success(null, 'Record archived');
     }
@@ -242,6 +256,13 @@ class ShopkeeperInventoryWriteService
     private function requireRow(string $table, int $shopId, int $id): void
     {
         abort_unless(DB::table($table)->where('shop_id', $shopId)->where('id', $id)->whereNull('deleted_at')->exists(), Response::HTTP_NOT_FOUND);
+    }
+
+    private function rowArray(string $table, int $id): array
+    {
+        $row = DB::table($table)->where('id', $id)->first();
+
+        return $row ? (array) $row : [];
     }
 
     private function incrementProduct(int $shopId, int $productId, int $quantity): void

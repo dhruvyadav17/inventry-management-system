@@ -17,6 +17,7 @@ class LogController extends Controller
     public function activities(Request $request): JsonResponse
     {
         $query = Activity::query()
+            ->with(['causer:id,name,email', 'subject'])
             ->when($request->filled('search'), fn ($query) => $query->where('description', 'like', '%'.$request->string('search')->toString().'%'))
             ->when($request->filled('date_from'), fn ($query) => $query->whereDate('created_at', '>=', $request->date('date_from')))
             ->when($request->filled('date_to'), fn ($query) => $query->whereDate('created_at', '<=', $request->date('date_to')))

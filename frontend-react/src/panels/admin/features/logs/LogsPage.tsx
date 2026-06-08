@@ -13,6 +13,9 @@ type LogRow = {
   action?: string;
   subject_type?: string;
   subject_id?: number;
+  auditable_type?: string;
+  auditable_id?: number;
+  causer?: { name?: string; email?: string } | null;
   user?: { name?: string; email?: string } | null;
   properties?: unknown;
   old_values?: unknown;
@@ -107,7 +110,7 @@ export function LogsPage({ type }: { type: LogType }) {
                   <td data-label="ID"><span className="id-pill">#{row.id}</span></td>
                   <td data-label={type === 'activities' ? 'Description' : 'Action'} className="fw-semibold">{row.description ?? row.action ?? '-'}</td>
                   <td data-label="Subject">{subjectLabel(row)}</td>
-                  <td data-label="User">{row.user?.name ?? row.user?.email ?? '-'}</td>
+                  <td data-label="User">{row.user?.name ?? row.user?.email ?? row.causer?.name ?? row.causer?.email ?? '-'}</td>
                   <td data-label="Date">{formatDate(row.created_at)}</td>
                 </tr>
               ))}
@@ -127,12 +130,15 @@ export function LogsPage({ type }: { type: LogType }) {
 }
 
 function subjectLabel(row: LogRow) {
-  if (!row.subject_type && !row.subject_id) {
+  const type = row.subject_type ?? row.auditable_type;
+  const id = row.subject_id ?? row.auditable_id;
+
+  if (!type && !id) {
     return '-';
   }
 
-  const subject = row.subject_type?.split('\\').pop() ?? 'Record';
-  return row.subject_id ? `${subject} #${row.subject_id}` : subject;
+  const subject = type?.split('\\').pop() ?? 'Record';
+  return id ? `${subject} #${id}` : subject;
 }
 
 function formatDate(value?: string) {

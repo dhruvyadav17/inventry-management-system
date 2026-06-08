@@ -322,6 +322,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  position: relative;
 }
 
 .icon-btn {
@@ -354,6 +355,13 @@ body {
 
 .notification-menu {
   position: relative;
+}
+
+.profile-menu:hover,
+.profile-menu:focus-within,
+.notification-menu:hover,
+.notification-menu:focus-within {
+  z-index: 1120;
 }
 
 .notification-trigger {
@@ -510,6 +518,26 @@ body {
 .profile-menu:focus-within .profile-dropdown {
   opacity: 1;
   visibility: visible;
+  transform: translateY(0);
+}
+
+.top-actions:has(.notification-menu:hover) .profile-dropdown,
+.top-actions:has(.notification-menu:focus-within) .profile-dropdown,
+.top-actions:has(.profile-menu:hover) .notification-dropdown,
+.top-actions:has(.profile-menu:focus-within) .notification-dropdown {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(6px);
+}
+
+.top-actions:has(.notification-menu:hover) .notification-menu .notification-dropdown,
+.top-actions:has(.notification-menu:focus-within) .notification-menu .notification-dropdown,
+.top-actions:has(.profile-menu:hover) .profile-menu .profile-dropdown,
+.top-actions:has(.profile-menu:focus-within) .profile-menu .profile-dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
   transform: translateY(0);
 }
 
