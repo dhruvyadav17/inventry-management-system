@@ -35,6 +35,7 @@ php artisan view:cache
 
 echo "==> Building frontend"
 cd "$ROOT/frontend-react"
+rm -rf "$ROOT/production-build/frontend"
 npm ci
 VITE_API_URL="$API_URL" VITE_PUBLIC_BASE_PATH="$FRONTEND_BASE_PATH" npm run build
 
