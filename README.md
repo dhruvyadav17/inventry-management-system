@@ -73,6 +73,30 @@ Deploy `backend-laravel` as the API app and point the web server/static host to 
 
 For AWS or any separate frontend/API domain, keep `SANCTUM_STATEFUL_API=false` because this frontend uses bearer tokens in the `Authorization` header. If you later switch to Sanctum cookie authentication, then set the stateful domains/session/CORS credential values together.
 
+### AWS Ubuntu Deploy
+
+On the EC2 server:
+
+```bash
+cd /var/www/inventry-management-system
+API_URL="http://43.204.141.93/api/v1" bash deployment/aws-deploy.sh
+```
+
+If your PHP-FPM service name is different:
+
+```bash
+PHP_FPM_SERVICE="php8.2-fpm" API_URL="http://43.204.141.93/api/v1" bash deployment/aws-deploy.sh
+```
+
+If a production API route returns `500`, run:
+
+```bash
+cd /var/www/inventry-management-system
+TOKEN="1|your-token" API_URL="http://43.204.141.93/api/v1" bash deployment/aws-diagnose.sh
+```
+
+This checks the latest git commit, migration status, required RBAC/cache tables, `/options/rbac`, and the last Laravel log lines.
+
 ## Verification
 
 ```bash
