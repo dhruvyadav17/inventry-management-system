@@ -127,4 +127,6 @@ return [
 
     'api_rate_limit_per_minute' => env('API_RATE_LIMIT_PER_MINUTE', 60),
 
+    'sanctum_stateful_api' => env('SANCTUM_STATEFUL_API', false),
+
 ];

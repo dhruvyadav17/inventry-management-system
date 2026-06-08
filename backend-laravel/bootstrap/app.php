@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
@@ -30,7 +31,11 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->statefulApi();
+        if (filter_var(env('SANCTUM_STATEFUL_API', false), FILTER_VALIDATE_BOOL)) {
+            $middleware->statefulApi();
+        }
+
+        $middleware->append(HandleCors::class);
         $middleware->append(SecurityHeaders::class);
         $middleware->alias([
             'role' => RoleMiddleware::class,

@@ -59,13 +59,19 @@ Useful production env values:
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://your-domain.com
+FRONTEND_URL=https://your-domain.com
 API_RATE_LIMIT_PER_MINUTE=60
+SANCTUM_STATEFUL_API=false
+CORS_ALLOWED_ORIGINS=https://your-domain.com
+CORS_SUPPORTS_CREDENTIALS=false
 VITE_API_URL=https://your-domain.com/api/v1
 VITE_PUBLIC_BASE_PATH=/
 VITE_BUILD_OUT_DIR=../production-build/frontend
 ```
 
 Deploy `backend-laravel` as the API app and point the web server/static host to `production-build/frontend` for the React app.
+
+For AWS or any separate frontend/API domain, keep `SANCTUM_STATEFUL_API=false` because this frontend uses bearer tokens in the `Authorization` header. If you later switch to Sanctum cookie authentication, then set the stateful domains/session/CORS credential values together.
 
 ## Verification
 
