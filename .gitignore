@@ -3,5 +3,6 @@
 /backend-laravel/storage/*.key
 /frontend-react/node_modules/
 /frontend-react/dist/
+/production-build/
 /.idea/
 /.vscode/

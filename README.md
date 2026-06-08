@@ -39,6 +39,34 @@ Set API URL when needed:
 VITE_API_URL=http://127.0.0.1:8000/api/v1
 ```
 
+## Production Build
+
+Frontend production assets are generated outside the source app in `production-build/frontend`.
+
+```powershell
+.\build-production.bat -ApiUrl "https://your-domain.com/api/v1"
+```
+
+Optional when the backend `.env` is already set for production:
+
+```powershell
+.\build-production.bat -ApiUrl "https://your-domain.com/api/v1" -BasePath "/" -WithLaravelOptimize
+```
+
+Useful production env values:
+
+```bash
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-domain.com
+API_RATE_LIMIT_PER_MINUTE=60
+VITE_API_URL=https://your-domain.com/api/v1
+VITE_PUBLIC_BASE_PATH=/
+VITE_BUILD_OUT_DIR=../production-build/frontend
+```
+
+Deploy `backend-laravel` as the API app and point the web server/static host to `production-build/frontend` for the React app.
+
 ## Verification
 
 ```bash
