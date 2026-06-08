@@ -24,6 +24,10 @@ export const adminApi = {
     roles: '/roles',
     permissions: '/permissions',
   } satisfies Record<ResourceName, string>,
+  logs: {
+    activities: '/logs/activities',
+    audits: '/logs/audits',
+  },
 };
 
 export const adminMenu: SidebarMenuGroup[] = [
