@@ -45,7 +45,7 @@ export function App() {
           <Route index element={requirePermission(PERMISSIONS.logsView, <LogsPage type="audits" />)} />
         </Route>
         <Route
-          path="/"
+          path="/*"
           element={protectedAdminLayout()}
         >
           <Route index element={<Navigate to="/dashboard" replace />} />
