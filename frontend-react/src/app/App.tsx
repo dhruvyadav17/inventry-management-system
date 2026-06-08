@@ -22,6 +22,14 @@ function requirePermission(permission: string, element: ReactElement) {
   return <RequirePermission permission={permission}>{element}</RequirePermission>;
 }
 
+function protectedAdminLayout() {
+  return (
+    <ProtectedRoute>
+      <AdminLayout />
+    </ProtectedRoute>
+  );
+}
+
 export function App() {
   return (
     <Suspense fallback={<PageLoader />}>
@@ -30,13 +38,15 @@ export function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/activity-logs" element={protectedAdminLayout()}>
+          <Route index element={requirePermission(PERMISSIONS.logsView, <LogsPage type="activities" />)} />
+        </Route>
+        <Route path="/audit-logs" element={protectedAdminLayout()}>
+          <Route index element={requirePermission(PERMISSIONS.logsView, <LogsPage type="audits" />)} />
+        </Route>
         <Route
           path="/"
-          element={(
-            <ProtectedRoute>
-              <AdminLayout />
-            </ProtectedRoute>
-          )}
+          element={protectedAdminLayout()}
         >
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={requirePermission(PERMISSIONS.dashboardView, <DashboardPage />)} />
