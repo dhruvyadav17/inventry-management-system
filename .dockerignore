@@ -1,0 +1,15 @@
+.git
+.github
+.idea
+.vscode
+automation-tests/reports
+backend-laravel/.env
+backend-laravel/vendor
+backend-laravel/node_modules
+backend-laravel/storage/logs/*.log
+backend-laravel/storage/framework/cache/*
+backend-laravel/storage/framework/sessions/*
+backend-laravel/storage/framework/views/*
+frontend-react/node_modules
+frontend-react/dist
+production-build

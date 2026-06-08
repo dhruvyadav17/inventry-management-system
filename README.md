@@ -103,3 +103,59 @@ This checks the latest git commit, migration status, required RBAC/cache tables,
 cd backend-laravel && php artisan test
 cd frontend-react && npm run build
 ```
+
+## Docker Automation
+
+This repo includes automated local Docker, AWS Docker deployment, and GitHub Actions CI/CD files.
+
+### Local Docker Deploy
+
+Start Docker Desktop first, then run:
+
+```powershell
+scripts\local-deploy.bat
+```
+
+The script builds the frontend, starts MySQL/PHP-FPM/Nginx, runs `migrate:fresh --seed`, links storage, and serves the app at:
+
+```text
+http://localhost
+```
+
+Useful local checks:
+
+```powershell
+docker compose ps
+docker compose logs -f backend
+docker compose logs -f nginx
+```
+
+### AWS Docker Deploy
+
+On EC2, keep `backend-laravel/.env` production-ready with `DB_HOST=mysql`, then run:
+
+```bash
+cd /var/www/inventry-management-system
+API_URL="http://43.204.141.93/api/v1" bash deployment/aws-docker-deploy.sh
+```
+
+Diagnostics:
+
+```bash
+cd /var/www/inventry-management-system
+API_URL="http://43.204.141.93/api/v1" bash deployment/aws-docker-diagnose.sh
+```
+
+### GitHub Actions CI/CD
+
+Add these repository secrets:
+
+```text
+EC2_HOST=43.204.141.93
+EC2_USER=deploy
+EC2_PROJECT_PATH=/var/www/inventry-management-system
+EC2_SSH_KEY=private SSH key
+VITE_API_URL=http://43.204.141.93/api/v1
+```
+
+After that, every push to `main` runs backend tests, frontend build, then deploys on EC2 through `deployment/aws-docker-deploy.sh`.

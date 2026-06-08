@@ -1,0 +1,61 @@
+name: Build Test Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: bcmath, gd, mbstring, pdo_mysql, xml, zip
+
+      - name: Backend test
+        working-directory: backend-laravel
+        run: |
+          composer install --no-interaction --prefer-dist
+          cp .env.example .env
+          php artisan key:generate
+          php artisan test
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend-react/package-lock.json
+
+      - name: Frontend build
+        working-directory: frontend-react
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_PUBLIC_BASE_PATH: /
+        run: |
+          npm ci
+          npm run build
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ${{ secrets.EC2_PROJECT_PATH }}
+            API_URL="${{ secrets.VITE_API_URL }}" bash deployment/aws-docker-deploy.sh
