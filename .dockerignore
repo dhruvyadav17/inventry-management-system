@@ -10,6 +10,7 @@ backend-laravel/storage/logs/*.log
 backend-laravel/storage/framework/cache/*
 backend-laravel/storage/framework/sessions/*
 backend-laravel/storage/framework/views/*
+backend-laravel/public/storage
 frontend-react/node_modules
 frontend-react/dist
 production-build
